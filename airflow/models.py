@@ -318,16 +318,30 @@ class DagBag(BaseDagBag, LoggingMixin):
                         self.file_last_changed[filepath] = file_last_changed_on_disk
 
         for m in mods:
-            for dag in list(m.__dict__.values()):
-                if isinstance(dag, DAG):
-                    if not dag.full_filepath:
-                        dag.full_filepath = filepath
-                    dag.is_subdag = False
-                    self.bag_dag(dag, parent_dag=dag, root_dag=dag)
-                    found_dags.append(dag)
-                    found_dags += dag.subdags
+            for item in list(m.__dict__.values()):
+                found_dags.extend(self.find_dags(item, filepath))
 
         self.file_last_changed[filepath] = file_last_changed_on_disk
+        return found_dags
+
+    def find_dags(self, item, filepath):
+        """Looks for dag instances, even if they are stored
+        inside list objects.
+        This allows dag declaration inside a loop statement.
+        For that, all the dag instances must be appended to
+        a list variable.
+        """
+        found_dags=[]
+        if isinstance(item, DAG):
+            dag = item
+            if not dag.full_filepath:
+                dag.full_filepath = filepath
+            dag.is_subdag = False
+            self.bag_dag(dag, parent_dag=dag, root_dag=dag)
+            found_dags.append(dag)
+        elif isinstance(item, list):
+            for sub_item in item:
+                found_dags.extend(self.find_dags(sub_item, filepath))
         return found_dags
 
     @provide_session
