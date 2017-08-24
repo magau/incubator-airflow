@@ -69,6 +69,14 @@ def sigint_handler(sig, frame):
     sys.exit(0)
 
 
+def activate_virtualenv(virtualenv_path):
+    if virtualenv_path is not None:
+        print('Activating virtualenv: {}'.format(virtualenv_path))
+        activate_this_file = os.path.join(virtualenv_path,
+                                          "bin/activate_this.py")
+        execfile(activate_this_file, dict(__file__=activate_this_file))
+
+
 def sigquit_handler(sig, frame):
     """Helps debug deadlocks by printing stacktraces when this gets a SIGQUIT
     e.g. kill -s QUIT <PID> or CTRL+\
@@ -729,6 +737,7 @@ def restart_workers(gunicorn_master_proc, num_workers_expected):
 
 
 def webserver(args):
+    activate_virtualenv(args.virtualenv_path)
     print(settings.HEADER)
 
     app = cached_app(conf)
@@ -850,6 +859,7 @@ def webserver(args):
 
 
 def scheduler(args):
+    activate_virtualenv(args.virtualenv_path)
     print(settings.HEADER)
     job = jobs.SchedulerJob(
         dag_id=args.dag_id,
@@ -1188,6 +1198,10 @@ class CLIFactory(object):
             ("--stdout", ), "Redirect stdout to this file"),
         'log_file': Arg(
             ("-l", "--log-file"), "Location of the log file"),
+        'virtualenv_path': Arg(
+            ("-ve","--virtualenv_path",),
+             help="Path to python virtualenv",
+             default=None),
 
         # backfill
         'mark_success': Arg(
@@ -1564,7 +1578,8 @@ class CLIFactory(object):
             'help': "Start a Airflow webserver instance",
             'args': ('port', 'workers', 'workerclass', 'worker_timeout', 'hostname',
                      'pid', 'daemon', 'stdout', 'stderr', 'access_logfile',
-                     'error_logfile', 'log_file', 'ssl_cert', 'ssl_key', 'debug'),
+                     'error_logfile', 'log_file', 'ssl_cert', 'ssl_key', 'debug',
+                     'virtualenv_path'),
         }, {
             'func': resetdb,
             'help': "Burn down and rebuild the metadata database",
@@ -1578,7 +1593,7 @@ class CLIFactory(object):
             'help': "Start a scheduler instance",
             'args': ('dag_id_opt', 'subdir', 'run_duration', 'num_runs',
                      'do_pickle', 'pid', 'daemon', 'stdout', 'stderr',
-                     'log_file'),
+                     'log_file', 'virtualenv_path'),
         }, {
             'func': worker,
             'help': "Start a Celery worker node",
