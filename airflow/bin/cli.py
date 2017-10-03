@@ -911,6 +911,7 @@ def serve_logs(args):
 
 
 def worker(args):
+    activate_virtualenv(args.virtualenv_path)
     env = os.environ.copy()
     env['AIRFLOW_HOME'] = settings.AIRFLOW_HOME
 
@@ -1597,7 +1598,8 @@ class CLIFactory(object):
             'func': worker,
             'help': "Start a Celery worker node",
             'args': ('do_pickle', 'queues', 'concurrency',
-                     'pid', 'daemon', 'stdout', 'stderr', 'log_file'),
+                     'pid', 'daemon', 'stdout', 'stderr', 'log_file',
+                     'virtualenv_path'),
         }, {
             'func': flower,
             'help': "Start a Celery Flower",
