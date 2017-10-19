@@ -13,8 +13,4 @@
 # limitations under the License.
 #
 
-<<<<<<< HEAD
-version = '1.9.0dev0+incubating'
-=======
 version = '1.8.2'
->>>>>>> 1.8.2+activate_virtualenv
