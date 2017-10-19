@@ -24,12 +24,19 @@ import shutil
 import unittest
 import six
 import socket
+<<<<<<< HEAD
 import threading
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 from tempfile import mkdtemp
 
 from airflow import AirflowException, settings, models
 from airflow.bin import cli
+<<<<<<< HEAD
 from airflow.executors import BaseExecutor, SequentialExecutor
+=======
+from airflow.executors import SequentialExecutor
+>>>>>>> 1.8.2+activate_virtualenv
 from airflow.jobs import BackfillJob, SchedulerJob, LocalTaskJob
 from airflow.models import DAG, DagModel, DagBag, DagRun, Pool, TaskInstance as TI
 from airflow.operators.dummy_operator import DummyOperator
@@ -37,9 +44,15 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.utils.db import provide_session
 from airflow.utils.state import State
 from airflow.utils.timeout import timeout
+<<<<<<< HEAD
 from airflow.utils.dag_processing import SimpleDagBag, list_py_file_paths
 
 from mock import Mock, patch
+=======
+from airflow.utils.dag_processing import SimpleDagBag
+
+from mock import patch
+>>>>>>> 1.8.2+activate_virtualenv
 from sqlalchemy.orm.session import make_transient
 from tests.executors.test_executor import TestExecutor
 
@@ -304,6 +317,7 @@ class BackfillJobTest(unittest.TestCase):
         self.assertEqual(ti.state, State.SUCCESS)
         dag.clear()
 
+<<<<<<< HEAD
     def test_cli_receives_delay_arg(self):
         """
         Tests that the --delay argument is passed correctly to the BackfillJob
@@ -481,6 +495,8 @@ class BackfillJobTest(unittest.TestCase):
         self.assertEqual(success_expected, success_dagruns)
         self.assertEqual(0, running_dagruns)  # no dag_runs in running state are left
 
+=======
+>>>>>>> 1.8.2+activate_virtualenv
     def test_sub_set_subdag(self):
         dag = DAG(
             'test_sub_set_subdag',
@@ -501,7 +517,11 @@ class BackfillJobTest(unittest.TestCase):
 
         dag.clear()
         dr = dag.create_dagrun(run_id="test",
+<<<<<<< HEAD
                                state=State.RUNNING,
+=======
+                               state=State.SUCCESS,
+>>>>>>> 1.8.2+activate_virtualenv
                                execution_date=DEFAULT_DATE,
                                start_date=DEFAULT_DATE)
 
@@ -545,7 +565,11 @@ class BackfillJobTest(unittest.TestCase):
 
         dag.clear()
         dr = dag.create_dagrun(run_id='test',
+<<<<<<< HEAD
                                state=State.RUNNING,
+=======
+                               state=State.SUCCESS,
+>>>>>>> 1.8.2+activate_virtualenv
                                execution_date=DEFAULT_DATE,
                                start_date=DEFAULT_DATE)
         executor = TestExecutor(do_update=True)
@@ -646,6 +670,7 @@ class BackfillJobTest(unittest.TestCase):
         ti = TI(task1, dr.execution_date)
         ti.refresh_from_db()
 
+<<<<<<< HEAD
         ti_status = BackfillJob._DagRunTaskStatus()
 
         # test for success
@@ -683,10 +708,61 @@ class BackfillJobTest(unittest.TestCase):
         self.assertTrue(len(ti_status.to_run) == 0)
 
         ti_status.failed.clear()
+=======
+        started = {}
+        tasks_to_run = {}
+        failed = set()
+        succeeded = set()
+        started = {}
+        skipped = set()
+
+        # test for success
+        ti.set_state(State.SUCCESS, session)
+        started[ti.key] = ti
+        job._update_counters(started=started, succeeded=succeeded,
+                                     skipped=skipped, failed=failed,
+                                     tasks_to_run=tasks_to_run)
+        self.assertTrue(len(started) == 0)
+        self.assertTrue(len(succeeded) == 1)
+        self.assertTrue(len(skipped) == 0)
+        self.assertTrue(len(failed) == 0)
+        self.assertTrue(len(tasks_to_run) == 0)
+
+        succeeded.clear()
+
+        # test for skipped
+        ti.set_state(State.SKIPPED, session)
+        started[ti.key] = ti
+        job._update_counters(started=started, succeeded=succeeded,
+                                     skipped=skipped, failed=failed,
+                                     tasks_to_run=tasks_to_run)
+        self.assertTrue(len(started) == 0)
+        self.assertTrue(len(succeeded) == 0)
+        self.assertTrue(len(skipped) == 1)
+        self.assertTrue(len(failed) == 0)
+        self.assertTrue(len(tasks_to_run) == 0)
+
+        skipped.clear()
+
+        # test for failed
+        ti.set_state(State.FAILED, session)
+        started[ti.key] = ti
+        job._update_counters(started=started, succeeded=succeeded,
+                                     skipped=skipped, failed=failed,
+                                     tasks_to_run=tasks_to_run)
+        self.assertTrue(len(started) == 0)
+        self.assertTrue(len(succeeded) == 0)
+        self.assertTrue(len(skipped) == 0)
+        self.assertTrue(len(failed) == 1)
+        self.assertTrue(len(tasks_to_run) == 0)
+
+        failed.clear()
+>>>>>>> 1.8.2+activate_virtualenv
 
         # test for reschedule
         # test for failed
         ti.set_state(State.NONE, session)
+<<<<<<< HEAD
         ti_status.started[ti.key] = ti
         job._update_counters(ti_status=ti_status)
         self.assertTrue(len(ti_status.started) == 0)
@@ -724,6 +800,20 @@ class BackfillJobTest(unittest.TestCase):
                              start_date=DEFAULT_DATE - datetime.timedelta(hours=3),
                              end_date=DEFAULT_DATE,))
 
+=======
+        started[ti.key] = ti
+        job._update_counters(started=started, succeeded=succeeded,
+                                     skipped=skipped, failed=failed,
+                                     tasks_to_run=tasks_to_run)
+        self.assertTrue(len(started) == 0)
+        self.assertTrue(len(succeeded) == 0)
+        self.assertTrue(len(skipped) == 0)
+        self.assertTrue(len(failed) == 0)
+        self.assertTrue(len(tasks_to_run) == 1)
+
+        session.close()
+
+>>>>>>> 1.8.2+activate_virtualenv
 
 class LocalTaskJobTest(unittest.TestCase):
     def setUp(self):
@@ -751,9 +841,13 @@ class LocalTaskJobTest(unittest.TestCase):
         ti.hostname = "blablabla"
         session.commit()
 
+<<<<<<< HEAD
         job1 = LocalTaskJob(task_instance=ti,
                             ignore_ti_state=True,
                             executor=SequentialExecutor())
+=======
+        job1 = LocalTaskJob(task_instance=ti, ignore_ti_state=True, executor=SequentialExecutor())
+>>>>>>> 1.8.2+activate_virtualenv
         self.assertRaises(AirflowException, job1.heartbeat_callback)
 
         is_descendant.return_value = True
@@ -792,9 +886,13 @@ class LocalTaskJobTest(unittest.TestCase):
         session.commit()
 
         ti_run = TI(task=task, execution_date=DEFAULT_DATE)
+<<<<<<< HEAD
         job1 = LocalTaskJob(task_instance=ti_run,
                             ignore_ti_state=True,
                             executor=SequentialExecutor())
+=======
+        job1 = LocalTaskJob(task_instance=ti_run, ignore_ti_state=True, executor=SequentialExecutor())
+>>>>>>> 1.8.2+activate_virtualenv
         self.assertRaises(AirflowException, job1.run)
 
         ti = dr.get_task_instance(task_id=task.task_id, session=session)
@@ -834,6 +932,7 @@ class SchedulerJobTest(unittest.TestCase):
         scheduler.heartrate = 0
         scheduler.run()
 
+<<<<<<< HEAD
     def test_execute_task_instances_is_paused_wont_execute(self):
         dag_id = 'SchedulerJobTest.test_execute_task_instances_is_paused_wont_execute'
         task_id_1 = 'dummy_task'
@@ -1175,6 +1274,10 @@ class SchedulerJobTest(unittest.TestCase):
 
     def test_execute_task_instances(self):
         dag_id = 'SchedulerJobTest.test_execute_task_instances'
+=======
+    def test_concurrency(self):
+        dag_id = 'SchedulerJobTest.test_concurrency'
+>>>>>>> 1.8.2+activate_virtualenv
         task_id_1 = 'dummy_task'
         task_id_2 = 'dummy_task_nonexistent_queue'
         # important that len(tasks) is less than concurrency
@@ -1220,7 +1323,11 @@ class SchedulerJobTest(unittest.TestCase):
 
         self.assertEqual(State.RUNNING, dr2.state)
 
+<<<<<<< HEAD
         res = scheduler._execute_task_instances(dagbag, [State.SCHEDULED])
+=======
+        scheduler._execute_task_instances(dagbag, [State.SCHEDULED])
+>>>>>>> 1.8.2+activate_virtualenv
 
         # check that concurrency is respected
         ti1.refresh_from_db()
@@ -1232,6 +1339,7 @@ class SchedulerJobTest(unittest.TestCase):
         self.assertEqual(State.RUNNING, ti1.state)
         self.assertEqual(State.RUNNING, ti2.state)
         six.assertCountEqual(self, [State.QUEUED, State.SCHEDULED], [ti3.state, ti4.state])
+<<<<<<< HEAD
         self.assertEqual(1, res)
 
     def test_execute_task_instances_limit(self):
@@ -1271,6 +1379,10 @@ class SchedulerJobTest(unittest.TestCase):
         for ti in tis:
             ti.refresh_from_db()
             self.assertEqual(State.QUEUED, ti.state)
+=======
+
+        session.close()
+>>>>>>> 1.8.2+activate_virtualenv
 
     def test_change_state_for_tis_without_dagrun(self):
         dag = DAG(

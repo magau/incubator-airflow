@@ -56,7 +56,12 @@ class TestDbApiHook(unittest.TestCase):
                 ("world",)]
         
         self.cur.fetchall.return_value = rows
+<<<<<<< HEAD
 
+=======
+        
+        
+>>>>>>> 1.8.2+activate_virtualenv
         self.assertEqual(rows, self.db_hook.get_records(statement, parameters))
         
         self.conn.close.assert_called_once()
@@ -72,4 +77,8 @@ class TestDbApiHook(unittest.TestCase):
         
         self.conn.close.assert_called_once()
         self.cur.close.assert_called_once()
+<<<<<<< HEAD
         self.cur.execute.assert_called_once_with(statement)
+=======
+        self.cur.execute.assert_called_once_with(statement)
+>>>>>>> 1.8.2+activate_virtualenv

@@ -89,11 +89,15 @@ def group_contains_user(conn, search_base, group_filter, user_name_attr, usernam
 
 def groups_user(conn, search_base, user_filter, user_name_att, username):
     search_filter = "(&({0})({1}={2}))".format(user_filter, user_name_att, username)
+<<<<<<< HEAD
     try:
         memberof_attr = configuration.get("ldap", "group_member_attr")
     except:
         memberof_attr = "memberOf"
     res = conn.search(native(search_base), native(search_filter), attributes=[native(memberof_attr)])
+=======
+    res = conn.search(native(search_base), native(search_filter), attributes=[native("memberOf")])
+>>>>>>> 1.8.2+activate_virtualenv
     if not res:
         LOG.info("Cannot find user %s", username)
         raise AuthenticationError("Invalid username or password")

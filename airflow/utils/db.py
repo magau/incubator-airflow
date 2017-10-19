@@ -26,6 +26,10 @@ from sqlalchemy import event, exc
 from sqlalchemy.pool import Pool
 
 from airflow import settings
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1.8.2+activate_virtualenv
 
 def provide_session(func):
     """
@@ -199,6 +203,7 @@ def initdb():
             host='yarn', extra='{"queue": "root.default"}'))
     merge_conn(
         models.Connection(
+<<<<<<< HEAD
             conn_id='redis_default', conn_type='redis',
             host='localhost', port=6379,
             extra='{"db": 0}'))
@@ -208,6 +213,8 @@ def initdb():
             host='rmdbs', extra=''))
     merge_conn(
         models.Connection(
+=======
+>>>>>>> 1.8.2+activate_virtualenv
             conn_id='emr_default', conn_type='emr',
             extra='''
                 {   "Name": "default_job_flow_name",

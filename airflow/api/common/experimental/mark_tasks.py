@@ -22,6 +22,10 @@ from airflow.utils.state import State
 
 from sqlalchemy import or_
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1.8.2+activate_virtualenv
 def _create_dagruns(dag, execution_dates, state, run_id_template):
     """
     Infers from the dates which dag runs need to be created and does so.
@@ -180,11 +184,15 @@ def set_state(task, execution_date, upstream=False, downstream=False,
         if len(sub_dag_ids) > 0:
             tis_altered += qry_sub_dag.all()
 
+<<<<<<< HEAD
     session.expunge_all()
+=======
+>>>>>>> 1.8.2+activate_virtualenv
     session.close()
 
     return tis_altered
 
+<<<<<<< HEAD
 def set_dag_run_state(dag, execution_date, state=State.SUCCESS, commit=False):
     """
     Set the state of a dag run and all task instances associated with the dag
@@ -216,3 +224,5 @@ def set_dag_run_state(dag, execution_date, state=State.SUCCESS, commit=False):
             dr.update_state()
 
     return res
+=======
+>>>>>>> 1.8.2+activate_virtualenv

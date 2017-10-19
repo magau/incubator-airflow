@@ -48,6 +48,7 @@ from flask._compat import PY2
 from jinja2.sandbox import ImmutableSandboxedEnvironment
 import markdown
 import nvd3
+import ast
 
 from wtforms import (
     Form, SelectField, TextAreaField, PasswordField, StringField, validators)
@@ -286,6 +287,16 @@ def get_chart_height(dag):
     return 600 + len(dag.tasks) * 10
 
 
+
+def get_chart_height(dag):
+    """
+    TODO(aoen): See [AIRFLOW-1263] We use the number of tasks in the DAG as a heuristic to
+    approximate the size of generated chart (otherwise the charts are tiny and unreadable
+    when DAGs have a large number of tasks). Ideally nvd3 should allow for dynamic-height
+    charts, that is charts that take up space based on the size of the components within.
+    """
+    return 600 + len(dag.tasks) * 10
+
 class Airflow(BaseView):
     def is_visible(self):
         return False
@@ -513,6 +524,7 @@ class Airflow(BaseView):
 
         LastDagRun = (
             session.query(DagRun.dag_id, sqla.func.max(DagRun.execution_date).label('execution_date'))
+<<<<<<< HEAD
                 .join(Dag, Dag.dag_id == DagRun.dag_id)
                 .filter(DagRun.state != State.RUNNING)
                 .filter(Dag.is_active == True)
@@ -525,6 +537,20 @@ class Airflow(BaseView):
                 .filter(DagRun.state == State.RUNNING)
                 .filter(Dag.is_active == True)
                 .subquery('running_dag_run')
+=======
+            .join(Dag, Dag.dag_id == DagRun.dag_id)
+            .filter(DagRun.state != State.RUNNING)
+            .filter(Dag.is_active == True)
+            .group_by(DagRun.dag_id)
+            .subquery('last_dag_run')
+        )
+        RunningDagRun = (
+            session.query(DagRun.dag_id, DagRun.execution_date)
+            .join(Dag, Dag.dag_id == DagRun.dag_id)
+            .filter(DagRun.state == State.RUNNING)
+            .filter(Dag.is_active == True)
+            .subquery('running_dag_run')
+>>>>>>> 1.8.2+activate_virtualenv
         )
 
         # Select all task_instances from active dag_runs.
@@ -1219,7 +1245,11 @@ class Airflow(BaseView):
 
             def set_duration(tid):
                 if (isinstance(tid, dict) and tid.get("state") == State.RUNNING and
+<<<<<<< HEAD
                             tid["start_date"] is not None):
+=======
+                        tid["start_date"] is not None):
+>>>>>>> 1.8.2+activate_virtualenv
                     d = datetime.now() - dateutil.parser.parse(tid["start_date"])
                     tid["duration"] = d.total_seconds()
                 return tid
@@ -1407,11 +1437,16 @@ class Airflow(BaseView):
                 include_upstream=True,
                 include_downstream=False)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1.8.2+activate_virtualenv
         chart_height = get_chart_height(dag)
         chart = nvd3.lineChart(
             name="lineChart", x_is_date=True, height=chart_height, width="1200")
         cum_chart = nvd3.lineChart(
             name="cumLineChart", x_is_date=True, height=chart_height, width="1200")
+<<<<<<< HEAD
 
         y = defaultdict(list)
         x = defaultdict(list)
@@ -1444,6 +1479,8 @@ class Airflow(BaseView):
                 fails_dict_key = (ti.dag_id, ti.task_id, ti.execution_date)
                 fails_total = fails_totals[fails_dict_key]
                 cum_y[ti.task_id].append(float(ti.duration + fails_total))
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 
         # determine the most relevant time unit for the set of task instance
         # durations for the DAG

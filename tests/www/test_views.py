@@ -15,11 +15,16 @@
 import unittest
 
 from airflow import configuration
+<<<<<<< HEAD
 from airflow import models
+=======
+from airflow.models import Pool
+>>>>>>> 1.8.2+activate_virtualenv
 from airflow.settings import Session
 from airflow.www import app as application
 
 
+<<<<<<< HEAD
 class TestChartModelView(unittest.TestCase):
 
     CREATE_ENDPOINT = '/admin/chart/new/?url=/admin/chart/'
@@ -210,6 +215,8 @@ class TestKnownEventView(unittest.TestCase):
         self.assertEqual(self.session.query(models.KnownEvent).count(), 0)
 
 
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 class TestPoolModelView(unittest.TestCase):
 
     CREATE_ENDPOINT = '/admin/pool/new/?url=/admin/pool/'
@@ -218,7 +225,11 @@ class TestPoolModelView(unittest.TestCase):
     def setUpClass(cls):
         super(TestPoolModelView, cls).setUpClass()
         session = Session()
+<<<<<<< HEAD
         session.query(models.Pool).delete()
+=======
+        session.query(Pool).delete()
+>>>>>>> 1.8.2+activate_virtualenv
         session.commit()
         session.close()
 
@@ -236,7 +247,11 @@ class TestPoolModelView(unittest.TestCase):
         }
 
     def tearDown(self):
+<<<<<<< HEAD
         self.session.query(models.Pool).delete()
+=======
+        self.session.query(Pool).delete()
+>>>>>>> 1.8.2+activate_virtualenv
         self.session.commit()
         self.session.close()
         super(TestPoolModelView, self).tearDown()
@@ -248,7 +263,11 @@ class TestPoolModelView(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
+<<<<<<< HEAD
         self.assertEqual(self.session.query(models.Pool).count(), 1)
+=======
+        self.assertEqual(self.session.query(Pool).count(), 1)
+>>>>>>> 1.8.2+activate_virtualenv
 
     def test_create_pool_with_same_name(self):
         # create test pool
@@ -264,7 +283,11 @@ class TestPoolModelView(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertIn('Already exists.', response.data.decode('utf-8'))
+<<<<<<< HEAD
         self.assertEqual(self.session.query(models.Pool).count(), 1)
+=======
+        self.assertEqual(self.session.query(Pool).count(), 1)
+>>>>>>> 1.8.2+activate_virtualenv
 
     def test_create_pool_with_empty_name(self):
         self.pool['pool'] = ''
@@ -274,7 +297,11 @@ class TestPoolModelView(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertIn('This field is required.', response.data.decode('utf-8'))
+<<<<<<< HEAD
         self.assertEqual(self.session.query(models.Pool).count(), 0)
+=======
+        self.assertEqual(self.session.query(Pool).count(), 0)
+>>>>>>> 1.8.2+activate_virtualenv
 
 
 if __name__ == '__main__':

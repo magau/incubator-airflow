@@ -29,8 +29,11 @@ from airflow.jobs import BackfillJob
 from airflow.models import DAG, TaskInstance as TI
 from airflow.models import State as ST
 from airflow.models import DagModel, DagStat
+<<<<<<< HEAD
 from airflow.models import clear_task_instances
 from airflow.models import XCom
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
@@ -40,6 +43,7 @@ from airflow.utils.state import State
 from airflow.utils.trigger_rule import TriggerRule
 from mock import patch
 from parameterized import parameterized
+
 
 
 DEFAULT_DATE = datetime.datetime(2016, 1, 1)
@@ -484,6 +488,7 @@ class DagRunTest(unittest.TestCase):
         state = dr.update_state()
         self.assertEqual(State.SUCCESS, state)
 
+<<<<<<< HEAD
     def test_dagrun_deadlock(self):
         session = settings.Session()
         dag = DAG(
@@ -516,6 +521,12 @@ class DagRunTest(unittest.TestCase):
         op2.trigger_rule = 'invalid'
         dr.update_state()
         self.assertEqual(dr.state, State.FAILED)
+=======
+        # upstream dependency failed, root has not run
+        ti_op1.set_state(State.NONE, session)
+        state = dr.update_state()
+        self.assertEqual(State.FAILED, state)
+>>>>>>> 1.8.2+activate_virtualenv
 
     def test_get_task_instance_on_empty_dagrun(self):
         """
@@ -555,7 +566,11 @@ class DagRunTest(unittest.TestCase):
         dag = DAG(
             dag_id='test_latest_runs_1',
             start_date=DEFAULT_DATE)
+<<<<<<< HEAD
         dag_1_run_1 = self.create_dag_run(dag,
+=======
+        dag_1_run_1 = self.create_dag_run(dag, 
+>>>>>>> 1.8.2+activate_virtualenv
                 execution_date=datetime.datetime(2015, 1, 1))
         dag_1_run_2 = self.create_dag_run(dag,
                 execution_date=datetime.datetime(2015, 1, 2))
@@ -565,6 +580,7 @@ class DagRunTest(unittest.TestCase):
             if dagrun.dag_id == 'test_latest_runs_1':
                 self.assertEqual(dagrun.execution_date, datetime.datetime(2015, 1, 2))
 
+<<<<<<< HEAD
     def test_is_backfill(self):
         dag = DAG(dag_id='test_is_backfill', start_date=DEFAULT_DATE)
         dagrun = self.create_dag_run(dag, execution_date=DEFAULT_DATE)
@@ -572,6 +588,8 @@ class DagRunTest(unittest.TestCase):
         dagrun2 = self.create_dag_run(dag, execution_date=DEFAULT_DATE + datetime.timedelta(days=1))
         self.assertTrue(dagrun.is_backfill)
         self.assertFalse(dagrun2.is_backfill)
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 
 class DagBagTest(unittest.TestCase):
 
@@ -647,6 +665,24 @@ class DagBagTest(unittest.TestCase):
         self.assertEqual(1, dagbag.process_file_calls)
         self.assertIsNotNone(dagbag.get_dag(dag_id))
         self.assertEqual(1, dagbag.process_file_calls)
+
+    def test_get_dag_fileloc(self):
+        """
+        Test that fileloc is correctly set when we load example DAGs,
+        specifically SubDAGs.
+        """
+        dagbag = models.DagBag(include_examples=True)
+
+        expected = {
+            'example_bash_operator': 'example_bash_operator.py',
+            'example_subdag_operator': 'example_subdag_operator.py',
+            'example_subdag_operator.section-1': 'subdags/subdag.py'
+        }
+
+        for dag_id, path in expected.items():
+            dag = dagbag.get_dag(dag_id)
+            self.assertTrue(
+                dag.fileloc.endswith('airflow/example_dags/' + path))
 
     def test_get_dag_fileloc(self):
         """
@@ -978,6 +1014,7 @@ class TaskInstanceTest(unittest.TestCase):
         dt = ti.next_retry_datetime()
         # between 30 * 2^0.5 and 30 * 2^1 (15 and 30)
         self.assertEqual(dt, ti.end_date + datetime.timedelta(seconds=20.0))
+<<<<<<< HEAD
 
         ti.try_number = 4
         dt = ti.next_retry_datetime()
@@ -993,6 +1030,23 @@ class TaskInstanceTest(unittest.TestCase):
         dt = ti.next_retry_datetime()
         self.assertEqual(dt, ti.end_date+max_delay)
 
+=======
+
+        ti.try_number = 4
+        dt = ti.next_retry_datetime()
+        # between 30 * 2^2 and 30 * 2^3 (120 and 240)
+        self.assertEqual(dt, ti.end_date + datetime.timedelta(seconds=181.0))
+
+        ti.try_number = 6
+        dt = ti.next_retry_datetime()
+        # between 30 * 2^4 and 30 * 2^5 (480 and 960)
+        self.assertEqual(dt, ti.end_date + datetime.timedelta(seconds=825.0))
+
+        ti.try_number = 9
+        dt = ti.next_retry_datetime()
+        self.assertEqual(dt, ti.end_date+max_delay)
+
+>>>>>>> 1.8.2+activate_virtualenv
         ti.try_number = 50
         dt = ti.next_retry_datetime()
         self.assertEqual(dt, ti.end_date+max_delay)

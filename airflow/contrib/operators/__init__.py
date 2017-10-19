@@ -37,7 +37,10 @@ _operators = {
     'vertica_to_hive': ['VerticaToHiveTransfer'],
     'qubole_operator': ['QuboleOperator'],
     'spark_submit_operator': ['SparkSubmitOperator'],
+<<<<<<< HEAD
     'file_to_wasb': ['FileToWasbOperator'],
+=======
+>>>>>>> 1.8.2+activate_virtualenv
     'fs_operator': ['FileSensor']
 }
 

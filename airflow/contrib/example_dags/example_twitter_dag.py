@@ -59,7 +59,11 @@ default_args = {
     'owner': 'Ekhtiar',
     'depends_on_past': False,
     'start_date': airflow.utils.dates.days_ago(5),
+<<<<<<< HEAD
     'email': ['airflow@example.com'],
+=======
+    'email': ['airflow@airflow.com'],
+>>>>>>> 1.8.2+activate_virtualenv
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,

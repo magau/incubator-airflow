@@ -117,8 +117,13 @@ class BranchOperatorTest(unittest.TestCase):
             if ti.task_id == 'make_choice':
                 self.assertEquals(ti.state, State.SUCCESS)
             elif ti.task_id == 'branch_1':
+<<<<<<< HEAD
                 # should exist with state None
                 self.assertEquals(ti.state, State.NONE)
+=======
+                # should not exist
+                raise
+>>>>>>> 1.8.2+activate_virtualenv
             elif ti.task_id == 'branch_2':
                 self.assertEquals(ti.state, State.SKIPPED)
             else:
@@ -147,6 +152,7 @@ class BranchOperatorTest(unittest.TestCase):
 
 
 class ShortCircuitOperatorTest(unittest.TestCase):
+<<<<<<< HEAD
     def test_without_dag_run(self):
         """This checks the defensive against non existent tasks in a dag run"""
         value = False
@@ -172,6 +178,36 @@ class ShortCircuitOperatorTest(unittest.TestCase):
         session = Session()
         tis = session.query(TI).filter(
             TI.dag_id == dag.dag_id,
+=======
+    def setUp(self):
+        self.dag = DAG('shortcircuit_operator_test',
+                       default_args={
+                           'owner': 'airflow',
+                           'start_date': DEFAULT_DATE},
+                       schedule_interval=INTERVAL)
+        self.short_op = ShortCircuitOperator(task_id='make_choice',
+                                             dag=self.dag,
+                                             python_callable=lambda: self.value)
+
+        self.branch_1 = DummyOperator(task_id='branch_1', dag=self.dag)
+        self.branch_1.set_upstream(self.short_op)
+        self.branch_2 = DummyOperator(task_id='branch_2', dag=self.dag)
+        self.branch_2.set_upstream(self.branch_1)
+        self.upstream = DummyOperator(task_id='upstream', dag=self.dag)
+        self.upstream.set_downstream(self.short_op)
+        self.dag.clear()
+
+        self.value = True
+
+    def test_without_dag_run(self):
+        """This checks the defensive against non existent tasks in a dag run"""
+        self.value = False
+        self.short_op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+
+        session = Session()
+        tis = session.query(TI).filter(
+            TI.dag_id == self.dag.dag_id,
+>>>>>>> 1.8.2+activate_virtualenv
             TI.execution_date == DEFAULT_DATE
         )
 
@@ -186,10 +222,17 @@ class ShortCircuitOperatorTest(unittest.TestCase):
             else:
                 raise
 
+<<<<<<< HEAD
         value = True
         dag.clear()
 
         short_op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+=======
+        self.value = True
+        self.dag.clear()
+
+        self.short_op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+>>>>>>> 1.8.2+activate_virtualenv
         for ti in tis:
             if ti.task_id == 'make_choice':
                 self.assertEquals(ti.state, State.SUCCESS)
@@ -204,6 +247,7 @@ class ShortCircuitOperatorTest(unittest.TestCase):
         session.close()
 
     def test_with_dag_run(self):
+<<<<<<< HEAD
         value = False
         dag = DAG('shortcircuit_operator_test_with_dag_run',
                   default_args={
@@ -224,14 +268,24 @@ class ShortCircuitOperatorTest(unittest.TestCase):
 
         logging.error("Tasks {}".format(dag.tasks))
         dr = dag.create_dagrun(
+=======
+        self.value = False
+        logging.error("Tasks {}".format(self.dag.tasks))
+        dr = self.dag.create_dagrun(
+>>>>>>> 1.8.2+activate_virtualenv
             run_id="manual__",
             start_date=datetime.datetime.now(),
             execution_date=DEFAULT_DATE,
             state=State.RUNNING
         )
 
+<<<<<<< HEAD
         upstream.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
         short_op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+=======
+        self.upstream.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+        self.short_op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+>>>>>>> 1.8.2+activate_virtualenv
 
         tis = dr.get_task_instances()
         self.assertEqual(len(tis), 4)
@@ -245,11 +299,19 @@ class ShortCircuitOperatorTest(unittest.TestCase):
             else:
                 raise
 
+<<<<<<< HEAD
         value = True
         dag.clear()
         dr.verify_integrity()
         upstream.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
         short_op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+=======
+        self.value = True
+        self.dag.clear()
+        dr.verify_integrity()
+        self.upstream.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+        self.short_op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+>>>>>>> 1.8.2+activate_virtualenv
 
         tis = dr.get_task_instances()
         self.assertEqual(len(tis), 4)

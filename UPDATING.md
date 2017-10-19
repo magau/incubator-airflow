@@ -5,6 +5,7 @@ assists people when migrating to a new version.
 
 ## Master
 
+<<<<<<< HEAD
 ### SSH Hook updates, along with new SSH Operator & SFTP Operator
   SSH Hook now uses Paramiko library to create ssh client connection, instead of sub-process based ssh command execution previously (<1.9.0), so this is backward incompatible.
   - update SSHHook constructor
@@ -15,6 +16,8 @@ assists people when migrating to a new version.
 ### Logging update
   Logs now are stored in the log folder as ``{dag_id}/{task_id}/{execution_date}/{try_number}.log``.
 
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 ### New Features
 
 #### Dask Executor
@@ -30,6 +33,7 @@ supported and will be removed entirely in Airflow 2.0
 
   Previously, post_execute() only took one argument, `context`.
 
+<<<<<<< HEAD
 - `contrib.hooks.gcp_dataflow_hook.DataFlowHook` starts to use `--runner=DataflowRunner` instead of `DataflowPipelineRunner`, which is removed from the package `google-cloud-dataflow-0.6.0`.
 
 - The pickle type for XCom messages has been replaced by json to prevent RCE attacks.
@@ -38,6 +42,8 @@ supported and will be removed entirely in Airflow 2.0
   By default pickling is still enabled until Airflow 2.0. To disable it 
   Set enable_xcom_pickling = False in your Airflow config.
 
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 ## Airflow 1.8.1
 
 The Airflow package name was changed from `airflow` to `apache-airflow` during this release. You must uninstall your

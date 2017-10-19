@@ -671,9 +671,13 @@ class HttpSensor(BaseSensorOperator):
         self.extra_options = extra_options or {}
         self.response_check = response_check
 
+<<<<<<< HEAD
         self.hook = HttpHook(
             method=method,
             http_conn_id=http_conn_id)
+=======
+        self.hook = HttpHook(method='GET', http_conn_id=http_conn_id)
+>>>>>>> 1.8.2+activate_virtualenv
 
     def poke(self, context):
         logging.info('Poking: ' + self.endpoint)

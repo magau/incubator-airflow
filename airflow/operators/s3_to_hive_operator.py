@@ -78,8 +78,11 @@ class S3ToHiveTransfer(BaseOperator):
     :param input_compressed: Boolean to determine if file decompression is
         required to process headers
     :type input_compressed: bool
+<<<<<<< HEAD
     :param tblproperties: TBLPROPERTIES of the hive table being created
     :type tblproperties: dict
+=======
+>>>>>>> 1.8.2+activate_virtualenv
     """
 
     template_fields = ('s3_key', 'partition', 'hive_table')
@@ -102,7 +105,10 @@ class S3ToHiveTransfer(BaseOperator):
             s3_conn_id='s3_default',
             hive_cli_conn_id='hive_cli_default',
             input_compressed=False,
+<<<<<<< HEAD
             tblproperties=None,
+=======
+>>>>>>> 1.8.2+activate_virtualenv
             *args, **kwargs):
         super(S3ToHiveTransfer, self).__init__(*args, **kwargs)
         self.s3_key = s3_key
@@ -118,7 +124,10 @@ class S3ToHiveTransfer(BaseOperator):
         self.hive_cli_conn_id = hive_cli_conn_id
         self.s3_conn_id = s3_conn_id
         self.input_compressed = input_compressed
+<<<<<<< HEAD
         self.tblproperties = tblproperties
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 
         if (self.check_headers and
                 not (self.field_dict is not None and self.headers)):
@@ -198,8 +207,12 @@ class S3ToHiveTransfer(BaseOperator):
                                     create=self.create,
                                     partition=self.partition,
                                     delimiter=self.delimiter,
+<<<<<<< HEAD
                                     recreate=self.recreate,
                                     tblproperties=self.tblproperties)
+=======
+                                    recreate=self.recreate)
+>>>>>>> 1.8.2+activate_virtualenv
 
     def _get_top_row_as_list(self, file_name):
         with open(file_name, 'rt') as f:

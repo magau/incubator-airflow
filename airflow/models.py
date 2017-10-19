@@ -98,7 +98,10 @@ def get_fernet():
     from cryptography.fernet import Fernet
     return Fernet(configuration.get('core', 'FERNET_KEY').encode('utf-8'))
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 if 'mysql' in settings.SQL_ALCHEMY_CONN:
     LongText = LONGTEXT
 else:
@@ -177,9 +180,12 @@ class DagBag(BaseDagBag, LoggingMixin):
             executor=None,
             include_examples=configuration.getboolean('core', 'LOAD_EXAMPLES')):
 
+<<<<<<< HEAD
         # do not use default arg in signature, to fix import cycle on plugin load
         if executor is None:
             executor = GetDefaultExecutor()
+=======
+>>>>>>> 1.8.2+activate_virtualenv
         dag_folder = dag_folder or settings.DAGS_FOLDER
         self.logger.info("Filling up the DagBag from {}".format(dag_folder))
         self.dag_folder = dag_folder
@@ -1346,8 +1352,13 @@ class TaskInstance(Base):
             self.state = State.NONE
             msg = ("FIXME: Rescheduling due to concurrency limits reached at task "
                    "runtime. Attempt {attempt} of {total}. State set to NONE.").format(
+<<<<<<< HEAD
                 attempt=self.try_number + 1,
                 total=self.max_tries + 1)
+=======
+                attempt=self.try_number % (task.retries + 1) + 1,
+                total=task.retries + 1)
+>>>>>>> 1.8.2+activate_virtualenv
             logging.warning(hr + msg + hr)
 
             self.queued_dttm = datetime.now()
@@ -2427,7 +2438,11 @@ class BaseOperator(object):
 
         count = qry.count()
 
+<<<<<<< HEAD
         clear_task_instances(qry.all(), session, dag=self.dag)
+=======
+        clear_task_instances(qry, session)
+>>>>>>> 1.8.2+activate_virtualenv
 
         session.commit()
         session.close()
@@ -3197,8 +3212,12 @@ class DAG(BaseDag, LoggingMixin):
 
         Heavily inspired by:
         http://blog.jupo.org/2012/04/06/topological-sorting-acyclic-directed-graphs/
+<<<<<<< HEAD
 
         :return: list of tasks in topological order
+=======
+        :returns: list of tasks in topological order
+>>>>>>> 1.8.2+activate_virtualenv
         """
 
         # copy the the tasks so we leave it unmodified
@@ -4159,6 +4178,7 @@ class DagStat(Base):
         :param session: db session to use
         :type session: Session
         """
+<<<<<<< HEAD
         try:
             qry = session.query(DagStat)
             if dag_ids:
@@ -4204,6 +4224,57 @@ class DagStat(Base):
         """
         Creates the missing states the stats table for the dag specified
 
+=======
+        if dag_ids is not None:
+            dag_ids = set(dag_ids)
+
+        try:
+            qry = session.query(DagStat)
+
+            if dag_ids is not None:
+                qry = qry.filter(DagStat.dag_id.in_(dag_ids))
+            if dirty_only:
+                qry = qry.filter(DagStat.dirty == True)
+
+            qry = qry.with_for_update().all()
+
+            ids = set([dag_stat.dag_id for dag_stat in qry])
+
+            # avoid querying with an empty IN clause
+            if len(ids) == 0:
+                session.commit()
+                return
+
+            dagstat_states = set(itertools.product(ids, State.dag_states))
+            qry = (
+                session.query(DagRun.dag_id, DagRun.state, func.count('*'))
+                .filter(DagRun.dag_id.in_(ids))
+                .group_by(DagRun.dag_id, DagRun.state)
+            )
+
+            counts = {(dag_id, state): count for dag_id, state, count in qry}
+            for dag_id, state in dagstat_states:
+                count = 0
+                if (dag_id, state) in counts:
+                    count = counts[(dag_id, state)]
+
+                session.merge(
+                    DagStat(dag_id=dag_id, state=state, count=count, dirty=False)
+                )
+
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            logging.warning("Could not update dag stat table")
+            logging.exception(e)
+
+    @staticmethod
+    @provide_session
+    def create(dag_id, session=None):
+        """
+        Creates the missing states the stats table for the dag specified
+
+>>>>>>> 1.8.2+activate_virtualenv
         :param dag_id: dag id of the dag to create stats for
         :param session: database session
         :return:
@@ -4569,6 +4640,29 @@ class DagRun(Base):
             .query(
                 cls.dag_id,
                 func.max(cls.execution_date).label('execution_date'))
+            .group_by(cls.dag_id)
+            .subquery()
+        )
+        dagruns = (
+            session
+            .query(cls)
+            .join(subquery,
+                  and_(cls.dag_id == subquery.c.dag_id,
+                       cls.execution_date == subquery.c.execution_date))
+            .all()
+        )
+        return dagruns
+
+    @classmethod
+    @provide_session
+    def get_latest_runs(cls, session):
+        """Returns the latest running DagRun for each DAG. """
+        subquery = (
+            session
+            .query(
+                cls.dag_id,
+                func.max(cls.execution_date).label('execution_date'))
+            .filter(cls.state == State.RUNNING)
             .group_by(cls.dag_id)
             .subquery()
         )

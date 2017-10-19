@@ -16,8 +16,11 @@ from __future__ import print_function
 
 import bleach
 import doctest
+<<<<<<< HEAD
 import json
 import logging
+=======
+>>>>>>> 1.8.2+activate_virtualenv
 import os
 import re
 import unittest
@@ -805,6 +808,30 @@ class CoreTest(unittest.TestCase):
         # restore the envvar back to the original state
         del os.environ[key]
 
+    def test_config_override_original_when_non_empty_envvar_is_provided(self):
+        key = "AIRFLOW__CORE__FERNET_KEY"
+        value = "some value"
+        assert key not in os.environ
+
+        os.environ[key] = value
+        FERNET_KEY = configuration.get('core', 'FERNET_KEY')
+        assert FERNET_KEY == value
+
+        # restore the envvar back to the original state
+        del os.environ[key]
+
+    def test_config_override_original_when_empty_envvar_is_provided(self):
+        key = "AIRFLOW__CORE__FERNET_KEY"
+        value = ""
+        assert key not in os.environ
+
+        os.environ[key] = value
+        FERNET_KEY = configuration.get('core', 'FERNET_KEY')
+        assert FERNET_KEY == value
+
+        # restore the envvar back to the original state
+        del os.environ[key]
+
     def test_class_with_logger_should_have_logger_with_correct_name(self):
 
         # each class should automatically receive a logger with a correct name
@@ -1382,7 +1409,11 @@ class CliTests(unittest.TestCase):
             '-s', DEFAULT_DATE.isoformat()]))
 
     def test_process_subdir_path_with_placeholder(self):
+<<<<<<< HEAD
         self.assertEqual(os.path.join(settings.DAGS_FOLDER, 'abc'), cli.process_subdir('DAGS_FOLDER/abc'))
+=======
+        assert cli.process_subdir('DAGS_FOLDER/abc') == os.path.join(settings.DAGS_FOLDER, 'abc')
+>>>>>>> 1.8.2+activate_virtualenv
 
     def test_trigger_dag(self):
         cli.trigger_dag(self.parser.parse_args([
@@ -1545,8 +1576,12 @@ class CliTests(unittest.TestCase):
         self.assertEqual(1, subprocess.Popen(["pgrep", "-c", "airflow"]).wait())
         self.assertEqual(1, subprocess.Popen(["pgrep", "-c", "gunicorn"]).wait())
 
+<<<<<<< HEAD
 
 class SecurityTests(unittest.TestCase):
+=======
+class WebUiTests(unittest.TestCase):
+>>>>>>> 1.8.2+activate_virtualenv
     def setUp(self):
         configuration.load_test_config()
         configuration.conf.set("webserver", "authenticate", "False")
@@ -1555,10 +1590,33 @@ class SecurityTests(unittest.TestCase):
         app.config['TESTING'] = True
         self.app = app.test_client()
 
-        self.dagbag = models.DagBag(
-            dag_folder=DEV_NULL, include_examples=True)
+        self.dagbag = models.DagBag(include_examples=True)
         self.dag_bash = self.dagbag.dags['example_bash_operator']
+        self.dag_bash2 = self.dagbag.dags['test_example_bash_operator']
+        self.sub_dag = self.dagbag.dags['example_subdag_operator']
         self.runme_0 = self.dag_bash.get_task('runme_0')
+        self.example_xcom = self.dagbag.dags['example_xcom']
+
+        self.dag_bash2.create_dagrun(
+            run_id="test_{}".format(models.DagRun.id_for_date(datetime.now())),
+            execution_date=DEFAULT_DATE,
+            start_date=datetime.now(),
+            state=State.RUNNING
+        )
+
+        self.sub_dag.create_dagrun(
+            run_id="test_{}".format(models.DagRun.id_for_date(datetime.now())),
+            execution_date=DEFAULT_DATE,
+            start_date=datetime.now(),
+            state=State.RUNNING
+        )
+
+        self.example_xcom.create_dagrun(
+            run_id="test_{}".format(models.DagRun.id_for_date(datetime.now())),
+            execution_date=DEFAULT_DATE,
+            start_date=datetime.now(),
+            state=State.RUNNING
+        )
 
     def get_csrf(self, response):
         tree = html.fromstring(response.data)
@@ -1714,11 +1772,19 @@ class WebUiTests(unittest.TestCase):
         response = self.app.get(
             '/admin/airflow/landing_times?'
             'days=30&dag_id=test_example_bash_operator')
+<<<<<<< HEAD
         self.assertIn("test_example_bash_operator", response.data.decode('utf-8'))
         response = self.app.get(
             '/admin/airflow/landing_times?'
             'days=30&dag_id=example_xcom')
         self.assertIn("example_xcom", response.data.decode('utf-8'))
+=======
+        assert "test_example_bash_operator" in response.data.decode('utf-8')
+        response = self.app.get(
+            '/admin/airflow/landing_times?'
+            'days=30&dag_id=example_xcom')
+        assert "example_xcom" in response.data.decode('utf-8')
+>>>>>>> 1.8.2+activate_virtualenv
         response = self.app.get(
             '/admin/airflow/gantt?dag_id=example_bash_operator')
         self.assertIn("example_bash_operator", response.data.decode('utf-8'))

@@ -156,7 +156,11 @@ def task_instance_info(dag_id, execution_date, task_id):
 @api_experimental.route('/latest_runs', methods=['GET'])
 @requires_authentication
 def latest_dag_runs():
+<<<<<<< HEAD
     """Returns the latest DagRun for each DAG formatted for the UI. """
+=======
+    """Returns the latest running DagRun for each DAG formatted for the UI. """
+>>>>>>> 1.8.2+activate_virtualenv
     from airflow.models import DagRun
     dagruns = DagRun.get_latest_runs()
     payload = []
@@ -170,6 +174,7 @@ def latest_dag_runs():
                 'dag_run_url': url_for('airflow.graph', dag_id=dagrun.dag_id,
                                        execution_date=dagrun.execution_date)
             })
+<<<<<<< HEAD
     return jsonify(items=payload)  # old flask versions dont support jsonifying arrays
 
 
@@ -234,3 +239,6 @@ def delete_pool(name):
         return response
     else:
         return jsonify(pool.to_json())
+=======
+    return jsonify(items=payload) # old flask versions dont support jsonifying arrays
+>>>>>>> 1.8.2+activate_virtualenv

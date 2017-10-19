@@ -46,8 +46,11 @@ if [ "${TRAVIS}" ]; then
     --cover-package=airflow \
     --cover-html-dir=airflow/www/static/coverage \
     --with-ignore-docstrings \
+<<<<<<< HEAD
     --rednose \
     --with-timer \
+=======
+>>>>>>> 1.8.2+activate_virtualenv
     -v \
     --logging-level=DEBUG "
     fi
@@ -70,8 +73,11 @@ else
     --cover-package=airflow \
     --cover-html-dir=airflow/www/static/coverage \
     --with-ignore-docstrings \
+<<<<<<< HEAD
     --rednose \
     --with-timer \
+=======
+>>>>>>> 1.8.2+activate_virtualenv
     -s \
     -v \
     --logging-level=DEBUG "
